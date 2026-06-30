@@ -31,12 +31,14 @@ export const metadata: Metadata = {
 
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import PageLoader from '@/components/ui/PageLoader';
 import { AuthProvider } from '@/lib/AuthProvider';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${bebasNeue.variable} ${playfairDisplay.variable} ${dmSans.variable}`}>
       <body className="bg-ink text-chalk font-body antialiased">
+        <PageLoader />
         <AuthProvider>
           <Navigation />
           {children}
