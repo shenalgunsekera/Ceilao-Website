@@ -54,7 +54,7 @@ export default function InsuranceBrokers() {
               transition={{ duration: 0.6 }}
               className="font-heading italic text-xl md:text-2xl text-gray-300 leading-relaxed mb-10"
             >
-              A broker works for you — not the insurance company. They are your trusted advisor in a complex market.
+              A broker works for you — not the insurance company. Ceilao is your trusted, independent advisor in Sri Lanka’s complex insurance market.
             </motion.p>
 
             <div className="space-y-8">
@@ -91,8 +91,8 @@ export default function InsuranceBrokers() {
                   ['Independent advice', 'yes', 'no'],
                   ['Multiple insurer access', 'yes', 'no'],
                   ['Claims advocacy', 'yes', 'no'],
-                  ['24/7 digital access', 'no', 'yes'],
-                  ['Lower premiums', 'varies', 'yes'],
+                  ['24/7 online portal', 'yes', 'varies'],
+                  ['Best price across market', 'yes', 'no'],
                   ['Personalised service', 'yes', 'no'],
                 ] as [string, string, string][]
               ).map(([label, broker, direct], i) => {
