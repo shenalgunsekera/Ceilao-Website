@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { loginWithPhonePassword } from '@/lib/customerAuth';
+import EyeToggle from '@/components/ui/EyeToggle';
 
 export default function LoginPage() {
   return (
@@ -21,6 +22,7 @@ function LoginInner() {
 
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -66,11 +68,14 @@ function LoginInner() {
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="font-body text-[11px] tracking-widest uppercase text-gray-500">Password</span>
-            <input
-              type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
-              onKeyDown={(e) => e.key === 'Enter' && submit()}
-              className="bg-ink border border-gray-700 rounded-lg px-4 py-3 text-chalk font-body text-sm outline-none focus:border-brand transition-colors"
-            />
+            <div className="relative">
+              <input
+                type={showPw ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••"
+                onKeyDown={(e) => e.key === 'Enter' && submit()}
+                className="bg-ink border border-gray-700 rounded-lg px-4 py-3 pr-11 text-chalk font-body text-sm outline-none focus:border-brand transition-colors w-full"
+              />
+              <EyeToggle show={showPw} onToggle={() => setShowPw((s) => !s)} />
+            </div>
           </label>
           {error && (
             <div className="rounded-lg bg-brand-600/15 border border-brand-600/30 px-3 py-2">

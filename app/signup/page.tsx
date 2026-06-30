@@ -11,6 +11,7 @@ import {
   sendSignupOtp,
   confirmSignup,
 } from '@/lib/customerAuth';
+import EyeToggle from '@/components/ui/EyeToggle';
 
 export default function SignupPage() {
   return (
@@ -55,8 +56,6 @@ function SignupInner() {
       const c = (err as { code?: string })?.code || '';
       if (c === 'auth/billing-not-enabled')
         setError('SMS verification is not enabled yet (Firebase Blaze plan required).');
-      else if (c === 'auth/too-many-requests')
-        setError('Too many attempts. Please try again later.');
       else if (c === 'auth/captcha-check-failed')
         setError('This domain isn’t authorised for SMS verification. Open the site on an authorised domain (e.g. localhost or ceilaoib.lk), not a raw IP address.');
       else if (c === 'auth/operation-not-allowed')
@@ -147,16 +146,22 @@ function SignupInner() {
 function Input({
   label, value, onChange, placeholder, type = 'text',
 }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string }) {
+  const [show, setShow] = useState(false);
+  const isPw = type === 'password';
+  const inputType = isPw ? (show ? 'text' : 'password') : type;
   return (
     <label className="flex flex-col gap-1.5">
       <span className="font-body text-[11px] tracking-widest uppercase text-gray-500">{label}</span>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="bg-ink border border-gray-700 rounded-lg px-4 py-3 text-chalk font-body text-sm outline-none focus:border-brand transition-colors"
-      />
+      <div className="relative">
+        <input
+          type={inputType}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={`bg-ink border border-gray-700 rounded-lg px-4 py-3 text-chalk font-body text-sm outline-none focus:border-brand transition-colors w-full ${isPw ? 'pr-11' : ''}`}
+        />
+        {isPw && <EyeToggle show={show} onToggle={() => setShow((s) => !s)} />}
+      </div>
     </label>
   );
 }
