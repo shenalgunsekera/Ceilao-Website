@@ -24,14 +24,20 @@ import { auth, db } from './firebase';
 const EMAIL_DOMAIN =
   process.env.NEXT_PUBLIC_CUSTOMER_EMAIL_DOMAIN || 'customers.ceilaoib.lk';
 
-/** Normalise a Sri Lankan phone number to E.164 (+94XXXXXXXXX). */
+/**
+ * Normalise a Sri Lankan mobile number to E.164 (+94XXXXXXXXX).
+ * Accepts every common way of typing it, e.g. all of these → +94743364614:
+ *   +94743364614 · 0094743364614 · 94743364614 · 0743364614 · 074 336 4614 · 743364614
+ */
 export function normalisePhone(raw: string): string | null {
-  const digits = (raw || '').replace(/[^\d+]/g, '');
-  let d = digits.replace(/^\+/, '');
-  if (d.startsWith('0')) d = '94' + d.slice(1); // 07X… -> 947X…
-  if (d.length === 9 && d.startsWith('7')) d = '94' + d; // 7XXXXXXXX
-  if (!d.startsWith('94') || d.length !== 11) return null;
-  return '+' + d;
+  let d = (raw || '').replace(/\D/g, ''); // keep digits only
+  // Strip any international / trunk prefix down to the 9-digit subscriber number.
+  if (d.startsWith('0094')) d = d.slice(4);
+  else if (d.startsWith('94')) d = d.slice(2);
+  else if (d.startsWith('0')) d = d.slice(1);
+  // SL mobiles are 9 digits starting with 7 (70/71/72/74/75/76/77/78).
+  if (d.length === 9 && d.startsWith('7')) return '+94' + d;
+  return null;
 }
 
 /** Synthetic email used as the email/password identifier for a phone. */
