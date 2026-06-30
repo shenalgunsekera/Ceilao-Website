@@ -61,6 +61,8 @@ function SignupInner() {
         setError('This domain isn’t authorised for SMS verification. Open the site on an authorised domain (e.g. localhost or ceilaoib.lk), not a raw IP address.');
       else if (c === 'auth/operation-not-allowed')
         setError('Phone sign-in is not enabled in Firebase yet.');
+      else if (c.includes('-39') || (err as Error)?.message?.includes('-39'))
+        setError('Verification couldn’t start. Please tap “Send verification code” again. If it keeps failing, SMS (Blaze plan) may not be enabled yet.');
       else setError((err as Error)?.message || 'Could not send the code. Try again.');
     } finally {
       setBusy(false);

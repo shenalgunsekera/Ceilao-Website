@@ -39,11 +39,20 @@ export function phoneToEmail(e164: string): string {
   return e164.replace('+', '') + '@' + EMAIL_DOMAIN;
 }
 
-/** Create (once) an invisible reCAPTCHA verifier bound to a container id. */
+/**
+ * Create a FRESH invisible reCAPTCHA verifier each time. A reCAPTCHA token is
+ * single-use, so reusing a verifier across attempts triggers obscure errors
+ * (e.g. auth/error-code:-39). We clear any previous verifier and empty its
+ * container before creating a new one.
+ */
 export function makeRecaptcha(containerId: string): RecaptchaVerifier {
-  // Reuse if already created on the window to avoid duplicates on re-render.
-  const w = window as unknown as { _ceilaoRecaptcha?: RecaptchaVerifier };
-  if (w._ceilaoRecaptcha) return w._ceilaoRecaptcha;
+  const w = window as unknown as { _ceilaoRecaptcha?: RecaptchaVerifier | null };
+  if (w._ceilaoRecaptcha) {
+    try { w._ceilaoRecaptcha.clear(); } catch { /* ignore */ }
+    w._ceilaoRecaptcha = null;
+  }
+  const el = document.getElementById(containerId);
+  if (el) el.innerHTML = '';
   const verifier = new RecaptchaVerifier(auth, containerId, { size: 'invisible' });
   w._ceilaoRecaptcha = verifier;
   return verifier;
