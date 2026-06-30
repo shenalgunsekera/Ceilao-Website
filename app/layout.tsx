@@ -27,10 +27,6 @@ export const metadata: Metadata = {
     'Ceilao Insurance Brokers — independent advice across Life and General insurance in Sri Lanka. Learn insurance, compare cover, and get a no-obligation quote.',
   keywords:
     'Ceilao, insurance brokers Sri Lanka, life insurance, general insurance, motor insurance, get a quote, Colombo insurance broker',
-  icons: {
-    icon: '/icon.svg',
-    shortcut: '/icon.svg',
-  },
 };
 
 import Navigation from '@/components/Navigation';
