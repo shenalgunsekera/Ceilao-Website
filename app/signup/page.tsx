@@ -57,6 +57,10 @@ function SignupInner() {
         setError('SMS verification is not enabled yet (Firebase Blaze plan required).');
       else if (c === 'auth/too-many-requests')
         setError('Too many attempts. Please try again later.');
+      else if (c === 'auth/captcha-check-failed')
+        setError('This domain isn’t authorised for SMS verification. Open the site on an authorised domain (e.g. localhost or ceilaoib.lk), not a raw IP address.');
+      else if (c === 'auth/operation-not-allowed')
+        setError('Phone sign-in is not enabled in Firebase yet.');
       else setError((err as Error)?.message || 'Could not send the code. Try again.');
     } finally {
       setBusy(false);
