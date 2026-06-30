@@ -1,0 +1,41 @@
+<svg width="1200" height="160" viewBox="0 0 1200 160" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap');
+    </style>
+    <clipPath id="clip-left">
+      <rect x="0" y="0" width="600" height="160"/>
+    </clipPath>
+    <clipPath id="clip-right">
+      <rect x="600" y="0" width="600" height="160"/>
+    </clipPath>
+  </defs>
+
+  <!-- Left half: white -->
+  <rect x="0"   y="0" width="600"  height="160" fill="#FAFAFA"/>
+  <!-- Right half: black -->
+  <rect x="600" y="0" width="600"  height="160" fill="#0A0A0A"/>
+
+  <!-- Same text twice — identical position, clipped to each half -->
+  <text
+    x="600" y="112"
+    text-anchor="middle"
+    font-family="'Playfair Display', Georgia, serif"
+    font-size="80"
+    font-weight="700"
+    letter-spacing="3"
+    fill="#0A0A0A"
+    clip-path="url(#clip-left)"
+  >THE INSURANCE COACH</text>
+
+  <text
+    x="600" y="112"
+    text-anchor="middle"
+    font-family="'Playfair Display', Georgia, serif"
+    font-size="80"
+    font-weight="700"
+    letter-spacing="3"
+    fill="#FAFAFA"
+    clip-path="url(#clip-right)"
+  >THE INSURANCE COACH</text>
+</svg>
