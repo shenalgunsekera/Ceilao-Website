@@ -108,9 +108,9 @@ export default function GetQuotePage() {
       });
 
       // Confirmation email to the customer (new EmailJS template).
-      const SID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+      const SID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_yz6mw9l';
       const TID = process.env.NEXT_PUBLIC_EMAILJS_CONFIRM_TEMPLATE_ID;
-      const PK = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+      const PK = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'bYa9JNcVpGNhyqbMV';
       if (SID && TID && PK && !TID.includes('REPLACE')) {
         try {
           await emailjs.send(SID, TID, {
