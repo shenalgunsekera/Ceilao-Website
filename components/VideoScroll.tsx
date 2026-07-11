@@ -8,16 +8,20 @@ import Link from 'next/link';
  */
 export default function VideoScroll() {
   return (
-    <section className="relative mt-16 h-[calc(100svh-4rem)] min-h-[520px] overflow-hidden bg-[#160B05]">
-      {/* Branded artwork — keep the glowing logo cluster in frame on all screens */}
+    <section className="relative mt-16 h-[calc(100svh-4rem)] min-h-[520px] overflow-hidden bg-[#1A0C05]">
+      {/* Top fill continuing the artwork's tones — the picture itself sits
+          lower, full-width, without zoom-stretching (which caused the blur) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#31150A] via-[#1A0C05] to-black" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/hero-banner.jpg"
         alt="Ceilao Insurance Brokers — get quotes, compare insurers, manage policies and claims in one place"
-        className="absolute inset-0 w-full h-full object-cover object-[72%_center]"
+        className="absolute inset-x-0 bottom-0 w-full h-[86%] object-cover object-[72%_30%]"
         fetchPriority="high"
         decoding="async"
       />
+      {/* Blend the picture's top edge into the fill */}
+      <div className="absolute inset-x-0 top-[8%] h-[14%] bg-gradient-to-b from-[#1A0C05] to-transparent" />
 
       {/* Readability scrim over the text side only */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
