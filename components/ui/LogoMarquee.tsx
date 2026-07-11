@@ -18,19 +18,16 @@ export default function LogoMarquee({ logos }: { logos: PartnerLogo[] }) {
     >
       <div className="flex w-max items-center animate-marquee group-hover:[animation-play-state:paused]">
         {row.map((logo, i) => (
-          <div
-            key={i}
-            className="shrink-0 mx-5 md:mx-8 flex items-center justify-center bg-white rounded-xl border border-gray-800 px-6 py-4"
-          >
+          <div key={i} className="shrink-0 mx-7 md:mx-10 flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={logo.src}
               alt={logo.alt}
-              className="h-10 md:h-14 w-auto object-contain"
+              className="h-16 md:h-24 w-auto object-contain rounded-lg"
               loading="lazy"
               decoding="async"
-              width={160}
-              height={56}
+              width={220}
+              height={96}
             />
           </div>
         ))}

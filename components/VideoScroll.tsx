@@ -1,48 +1,50 @@
 import Link from 'next/link';
 
 /**
- * Home hero: a real photo (public/hero-banner.jpg) under a dark scrim so the
- * headline is always crisp. Static markup — no client JS — so it paints
- * instantly and scrolls smoothly on mobile.
+ * Home hero — the branded Ceilao visual fills EXACTLY the viewport below the
+ * fixed 64px header (no more, no less). The image's key artwork sits on the
+ * right, so the copy sits left over the darker map area with a scrim for
+ * guaranteed readability.
  */
 export default function VideoScroll() {
   return (
-    <section className="relative h-[92vh] min-h-[560px] overflow-hidden bg-[#1B1E24]">
-      {/* Photo */}
+    <section className="relative mt-16 h-[calc(100svh-4rem)] min-h-[520px] overflow-hidden bg-[#160B05]">
+      {/* Branded artwork — keep the glowing logo cluster in frame on all screens */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/hero-banner.jpg"
-        alt="A family enjoying an evening walk — protected by the right insurance"
-        className="absolute inset-0 w-full h-full object-cover"
+        alt="Ceilao Insurance Brokers — get quotes, compare insurers, manage policies and claims in one place"
+        className="absolute inset-0 w-full h-full object-cover object-[72%_center]"
         fetchPriority="high"
         decoding="async"
       />
 
-      {/* Scrim — darker at the bottom-left where the text sits */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/25" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-transparent to-transparent" />
+      {/* Readability scrim over the text side only */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent" />
 
-      {/* Copy */}
-      <div className="absolute inset-0 flex items-end">
-        <div className="max-w-[1600px] w-full mx-auto px-6 md:px-12 pb-20 md:pb-28">
+      {/* Copy — vertically centered, left */}
+      <div className="relative h-full max-w-[1600px] mx-auto px-6 md:px-12 flex flex-col justify-center">
+        <div className="max-w-2xl">
           <p className="font-body text-[11px] md:text-xs tracking-widest3 text-brand-light uppercase mb-4 animate-fade-in">
             Independent insurance brokers · Sri Lanka
           </p>
           <h1
-            className="font-display text-white leading-[0.95] animate-fade-up"
-            style={{ fontSize: 'clamp(44px, 8vw, 110px)', letterSpacing: '0.02em' }}
+            className="font-display text-white leading-[0.95] animate-fade-up drop-shadow-[0_2px_14px_rgba(0,0,0,0.55)]"
+            style={{ fontSize: 'clamp(42px, 6.5vw, 96px)', letterSpacing: '0.02em' }}
           >
             INSURANCE THAT<br />
-            <span className="bg-brand-gradient bg-clip-text text-transparent">ACTUALLY HAS YOUR BACK</span>
+            <span className="text-brand-light">ACTUALLY HAS YOUR BACK</span>
           </h1>
-          <p className="mt-5 font-body text-white/85 text-base md:text-lg max-w-xl">
-            One request, every leading insurer compared, zero pressure. We work for you — not the insurance company.
+          <p className="mt-5 font-body text-white/90 text-base md:text-lg max-w-xl drop-shadow-[0_1px_8px_rgba(0,0,0,0.6)]">
+            Get quotes, compare every leading insurer, buy and manage your policy — with real
+            humans on your side at claim time. We work for you, not the insurance company.
           </p>
           <div className="flex flex-wrap gap-3 mt-8">
             <Link href="/get-quote" className="btn-brand px-8 py-3.5">Get my free quote</Link>
             <Link
               href="/brokers"
-              className="inline-flex items-center px-7 py-3.5 rounded-full border border-white/40 text-white font-body text-xs font-semibold tracking-widest uppercase hover:bg-white hover:text-chalk transition-colors"
+              className="inline-flex items-center px-7 py-3.5 rounded-full border border-white/50 bg-black/20 text-white font-body text-xs font-semibold tracking-widest uppercase hover:bg-white hover:text-chalk transition-colors"
             >
               Why use a broker?
             </Link>
@@ -51,9 +53,9 @@ export default function VideoScroll() {
       </div>
 
       {/* Scroll cue */}
-      <div className="absolute bottom-6 right-6 md:right-12 hidden sm:flex flex-col items-center gap-2">
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-1.5">
         <span className="font-body text-[10px] tracking-widest2 text-white/60 uppercase">Scroll</span>
-        <div className="w-px h-10 bg-gradient-to-b from-white/60 to-transparent" />
+        <div className="w-px h-8 bg-gradient-to-b from-white/60 to-transparent" />
       </div>
     </section>
   );
