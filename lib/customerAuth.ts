@@ -12,6 +12,7 @@ import {
   signInWithPhoneNumber,
   EmailAuthProvider,
   linkWithCredential,
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   updateProfile,
@@ -20,6 +21,7 @@ import {
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from './firebase';
+import { getOrCreateDeviceId } from './deviceId';
 
 const EMAIL_DOMAIN =
   process.env.NEXT_PUBLIC_CUSTOMER_EMAIL_DOMAIN || 'customers.ceilaoib.lk';
@@ -105,6 +107,49 @@ export async function confirmSignup(
       phone: opts.e164,
       phone_verified: true,
       role: 'customer',
+      created_at: serverTimestamp(),
+    },
+    { merge: true }
+  );
+
+  return user;
+}
+
+/**
+ * FREE signup — no SMS OTP.
+ * One account per phone number is enforced by Firebase itself: each phone maps
+ * to exactly one synthetic email, and a second create attempt throws
+ * auth/email-already-in-use. Accounts start with phone_verified:false; staff
+ * confirm phone ownership on the first call (Admin Panel → Customers) — the
+ * broker calls every customer before processing a quote anyway.
+ * The signup device ID is a soft signal so staff can spot one browser creating
+ * many accounts.
+ */
+export async function signupWithPhonePassword(opts: {
+  fullName: string;
+  rawPhone: string;
+  password: string;
+}): Promise<User> {
+  const e164 = normalisePhone(opts.rawPhone);
+  if (!e164) throw new Error('Enter a valid Sri Lankan mobile number.');
+
+  const email = phoneToEmail(e164);
+  const cred = await createUserWithEmailAndPassword(auth, email, opts.password);
+  const user = cred.user;
+
+  await updateProfile(user, { displayName: opts.fullName });
+
+  let deviceId = '';
+  try { deviceId = await getOrCreateDeviceId(); } catch { /* best-effort */ }
+
+  await setDoc(
+    doc(db, 'customers', user.uid),
+    {
+      full_name: opts.fullName,
+      phone: e164,
+      phone_verified: false,
+      role: 'customer',
+      signup_device_id: deviceId,
       created_at: serverTimestamp(),
     },
     { merge: true }

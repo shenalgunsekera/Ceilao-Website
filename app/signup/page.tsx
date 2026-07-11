@@ -4,13 +4,7 @@ import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import type { ConfirmationResult } from 'firebase/auth';
-import {
-  normalisePhone,
-  makeRecaptcha,
-  sendSignupOtp,
-  confirmSignup,
-} from '@/lib/customerAuth';
+import { normalisePhone, signupWithPhonePassword } from '@/lib/customerAuth';
 import EyeToggle from '@/components/ui/EyeToggle';
 
 export default function SignupPage() {
@@ -26,18 +20,14 @@ function SignupInner() {
   const params = useSearchParams();
   const next = params.get('next') || '/dashboard';
 
-  const [step, setStep] = useState<1 | 2>(1);
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const [code, setCode] = useState('');
-  const [e164, setE164] = useState('');
-  const [confirmation, setConfirmation] = useState<ConfirmationResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
-  const sendCode = async () => {
+  const createAccount = async () => {
     setError('');
     if (!fullName.trim()) return setError('Please enter your full name.');
     const norm = normalisePhone(phone);
@@ -47,41 +37,15 @@ function SignupInner() {
 
     setBusy(true);
     try {
-      const verifier = makeRecaptcha('recaptcha-container');
-      const conf = await sendSignupOtp(norm, verifier);
-      setConfirmation(conf);
-      setE164(norm);
-      setStep(2);
-    } catch (err: unknown) {
-      const c = (err as { code?: string })?.code || '';
-      if (c === 'auth/billing-not-enabled')
-        setError('SMS verification is not enabled yet (Firebase Blaze plan required).');
-      else if (c === 'auth/captcha-check-failed')
-        setError('This domain isn’t authorised for SMS verification. Open the site on an authorised domain (e.g. localhost or ceilaoib.lk), not a raw IP address.');
-      else if (c === 'auth/operation-not-allowed')
-        setError('Phone sign-in is not enabled in Firebase yet.');
-      else if (c.includes('-39') || (err as Error)?.message?.includes('-39'))
-        setError('Verification couldn’t start. Please tap “Send verification code” again. If it keeps failing, SMS (Blaze plan) may not be enabled yet.');
-      else setError((err as Error)?.message || 'Could not send the code. Try again.');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const verify = async () => {
-    setError('');
-    if (!confirmation) return;
-    if (code.trim().length < 4) return setError('Enter the 6-digit code from the SMS.');
-    setBusy(true);
-    try {
-      await confirmSignup(confirmation, code.trim(), { fullName: fullName.trim(), e164, password });
+      await signupWithPhonePassword({ fullName: fullName.trim(), rawPhone: phone, password });
       router.push(next);
     } catch (err: unknown) {
       const c = (err as { code?: string })?.code || '';
-      if (c === 'auth/invalid-verification-code') setError('That code is incorrect. Please re-check.');
-      else if (c === 'auth/email-already-in-use')
+      if (c === 'auth/email-already-in-use')
         setError('An account already exists for this phone number. Please log in instead.');
-      else setError((err as Error)?.message || 'Verification failed. Try again.');
+      else if (c === 'auth/weak-password')
+        setError('Please choose a stronger password (at least 6 characters).');
+      else setError((err as Error)?.message || 'Could not create the account. Try again.');
     } finally {
       setBusy(false);
     }
@@ -106,38 +70,24 @@ function SignupInner() {
         </div>
 
         <div className="bg-gray-900/80 border border-gray-800 rounded-2xl p-7 backdrop-blur">
-          {step === 1 ? (
-            <div className="flex flex-col gap-4">
-              <Input label="Full name" value={fullName} onChange={setFullName} placeholder="Nimal Perera" />
-              <Input label="Mobile number" value={phone} onChange={setPhone} placeholder="077 123 4567" type="tel" />
-              <Input label="Password" value={password} onChange={setPassword} placeholder="••••••••" type="password" />
-              <Input label="Confirm password" value={confirm} onChange={setConfirm} placeholder="••••••••" type="password" />
-              {error && <ErrorMsg>{error}</ErrorMsg>}
-              <button onClick={sendCode} disabled={busy} className="btn-brand mt-1">
-                {busy ? 'Sending code…' : 'Send verification code'}
-              </button>
-              <p className="text-center font-body text-xs text-gray-500 mt-1">
-                Already have an account?{' '}
-                <Link href="/login" className="text-brand-light hover:underline">Log in</Link>
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <p className="font-body text-sm text-gray-300">
-                We sent a 6-digit code to <span className="text-chalk font-semibold">{e164}</span>.
-              </p>
-              <Input label="Verification code" value={code} onChange={setCode} placeholder="123456" type="tel" />
-              {error && <ErrorMsg>{error}</ErrorMsg>}
-              <button onClick={verify} disabled={busy} className="btn-brand mt-1">
-                {busy ? 'Verifying…' : 'Verify & create account'}
-              </button>
-              <button onClick={() => { setStep(1); setError(''); }} className="font-body text-xs text-gray-500 hover:text-chalk">
-                ← Change details
-              </button>
-            </div>
-          )}
+          <div className="flex flex-col gap-4">
+            <Input label="Full name" value={fullName} onChange={setFullName} placeholder="Nimal Perera" />
+            <Input label="Mobile number" value={phone} onChange={setPhone} placeholder="077 123 4567" type="tel" />
+            <Input label="Password" value={password} onChange={setPassword} placeholder="••••••••" type="password" />
+            <Input label="Confirm password" value={confirm} onChange={setConfirm} placeholder="••••••••" type="password" />
+            {error && <ErrorMsg>{error}</ErrorMsg>}
+            <button onClick={createAccount} disabled={busy} className="btn-brand mt-1">
+              {busy ? 'Creating account…' : 'Create account'}
+            </button>
+            <p className="text-center font-body text-xs text-gray-500 mt-1">
+              Already have an account?{' '}
+              <Link href="/login" className="text-brand-light hover:underline">Log in</Link>
+            </p>
+            <p className="text-center font-body text-[11px] text-gray-600">
+              One account per mobile number. We&apos;ll confirm your number when our broker first calls you.
+            </p>
+          </div>
         </div>
-        <div id="recaptcha-container" />
       </motion.div>
     </main>
   );
