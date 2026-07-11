@@ -4,54 +4,61 @@ import { useEffect, useState } from 'react';
 import Loader from './Loader';
 
 /**
- * Brief branded overlay on FIRST visit only.
- * Perf notes:
- *  • It never waits for window.load (which blocks on every image/font and made
- *    the site feel seconds-slow) — it fades as soon as the DOM is interactive,
- *    with a 900 ms hard cap.
- *  • Repeat navigations in the same session skip it entirely.
- *  • Once faded it unmounts, so no invisible full-screen layer sits over the
- *    page eating compositing time while you scroll.
+ * Brief branded overlay on first visit.
+ *
+ * Hydration-safe: the server and the client's first render are IDENTICAL
+ * (overlay visible) — all decisions happen inside useEffect, after hydration.
+ * Reading sessionStorage in the state initializer caused a server/client
+ * mismatch that left the overlay stuck on refresh.
+ *
+ * Perf: never waits for window.load; fades on DOM-ready with a 900 ms hard
+ * cap, skips instantly on repeat visits in the same session, and fully
+ * unmounts after fading so nothing overlays the page while scrolling.
  */
 export default function PageLoader() {
-  const [done, setDone] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    try { return sessionStorage.getItem('cib_seen') === '1'; } catch { return false; }
-  });
-  const [gone, setGone] = useState(done);
+  const [phase, setPhase] = useState<'show' | 'fade' | 'gone'>('show');
 
   useEffect(() => {
-    if (done) return;
-    try { sessionStorage.setItem('cib_seen', '1'); } catch { /* ignore */ }
+    let fadeTimer: ReturnType<typeof setTimeout> | undefined;
+    let goneTimer: ReturnType<typeof setTimeout> | undefined;
+    let finished = false;
 
-    const finish = () => setDone(true);
-    // Fade when the DOM is ready — never wait for images/fonts.
-    if (document.readyState !== 'loading') {
-      const t = setTimeout(finish, 250);
-      return () => clearTimeout(t);
-    }
-    document.addEventListener('DOMContentLoaded', finish, { once: true });
-    const cap = setTimeout(finish, 900); // hard cap
-    return () => {
-      document.removeEventListener('DOMContentLoaded', finish);
-      clearTimeout(cap);
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      setPhase('fade');
+      goneTimer = setTimeout(() => setPhase('gone'), 450);
     };
-  }, [done]);
 
-  // Unmount after the fade so nothing overlays the page afterwards.
-  useEffect(() => {
-    if (!done || gone) return;
-    const t = setTimeout(() => setGone(true), 450);
-    return () => clearTimeout(t);
-  }, [done, gone]);
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem('cib_seen') === '1';
+      sessionStorage.setItem('cib_seen', '1');
+    } catch { /* ignore */ }
 
-  if (gone) return null;
+    if (seen) {
+      finish(); // repeat visit — dismiss immediately
+    } else if (document.readyState !== 'loading') {
+      fadeTimer = setTimeout(finish, 250);
+    } else {
+      document.addEventListener('DOMContentLoaded', finish, { once: true });
+      fadeTimer = setTimeout(finish, 900); // hard cap — can never get stuck
+    }
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(goneTimer);
+      document.removeEventListener('DOMContentLoaded', finish);
+    };
+  }, []);
+
+  if (phase === 'gone') return null;
 
   return (
     <div
-      aria-hidden={done}
+      aria-hidden={phase !== 'show'}
       className={`fixed inset-0 z-[200] transition-opacity duration-500 ${
-        done ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        phase === 'show' ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
     >
       <Loader />
