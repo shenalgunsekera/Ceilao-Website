@@ -4,18 +4,18 @@ import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 
 const companies = [
-  { name: 'Sri Lanka Insurance', type: 'Composite', founded: '1962', specialty: 'State insurer — life & general, strong claims record' },
-  { name: 'Ceylinco Life', type: 'Life', founded: '1988', specialty: 'One of Sri Lanka’s largest life insurers' },
-  { name: 'Union Assurance', type: 'Life', founded: '1987', specialty: 'Life cover, savings & retirement plans' },
-  { name: 'AIA Insurance Lanka', type: 'Life & Health', founded: '1987', specialty: 'Life, critical illness & health solutions' },
-  { name: 'Allianz Lanka', type: 'General & Life', founded: '2008', specialty: 'Motor, property & global Allianz backing' },
-  { name: 'Fairfirst Insurance', type: 'General', founded: '2017', specialty: 'Motor, home, travel & business cover' },
+  { name: 'Sri Lanka Insurance', logo: '/partners/slic.jpg', type: 'Composite', founded: '1962', specialty: 'State insurer — life & general, strong claims record' },
+  { name: 'Ceylinco Life', logo: '/partners/ceylinco.jpg', type: 'Life', founded: '1988', specialty: 'One of Sri Lanka’s largest life insurers' },
+  { name: 'Union Assurance', logo: '/partners/union.jpg', type: 'Life', founded: '1987', specialty: 'Life cover, savings & retirement plans' },
+  { name: 'AIA Insurance Lanka', logo: '/partners/aia.jpg', type: 'Life & Health', founded: '1987', specialty: 'Life, critical illness & health solutions' },
+  { name: 'Allianz Lanka', logo: '/partners/allianz.jpg', type: 'General & Life', founded: '2008', specialty: 'Motor, property & global Allianz backing' },
+  { name: 'Fairfirst Insurance', logo: '/partners/fairfirst.jpg', type: 'General', founded: '2017', specialty: 'Motor, home, travel & business cover' },
   { name: 'Janashakthi Insurance', type: 'Life', founded: '1994', specialty: 'Life & savings for Sri Lankan families' },
-  { name: 'Softlogic Life', type: 'Life & Health', founded: '1999', specialty: 'Fast-growing life & health insurer' },
-  { name: 'HNB Assurance', type: 'Life & General', founded: '2001', specialty: 'Bank-backed life and general cover' },
-  { name: 'LOLC General', type: 'General', founded: '2008', specialty: 'Motor, property & SME insurance' },
-  { name: 'Continental Insurance', type: 'General', founded: '2002', specialty: 'Motor, marine & non-life cover' },
-  { name: 'Orient Insurance', type: 'General', founded: '2007', specialty: 'Motor, travel & general insurance' },
+  { name: 'Softlogic Life', logo: '/partners/softlogic.jpg', type: 'Life & Health', founded: '1999', specialty: 'Fast-growing life & health insurer' },
+  { name: 'HNB Assurance', logo: '/partners/hnb.jpg', type: 'Life & General', founded: '2001', specialty: 'Bank-backed life and general cover' },
+  { name: 'LOLC General', logo: '/partners/lolc.jpg', type: 'General', founded: '2008', specialty: 'Motor, property & SME insurance' },
+  { name: 'Continental Insurance', logo: '/partners/continental.jpg', type: 'General', founded: '2002', specialty: 'Motor, marine & non-life cover' },
+  { name: 'Orient Insurance', logo: '/partners/orient.jpg', type: 'General', founded: '2007', specialty: 'Motor, travel & general insurance' },
 ];
 
 export default function InsuranceCompanies() {
@@ -61,8 +61,13 @@ export default function InsuranceCompanies() {
               transition={{ duration: 0.6, delay: i * 0.06, ease: [0.22, 1, 0.36, 1] }}
               className="group flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-0 py-6 border-b border-gray-200 hover:bg-gray-100/50 px-0 hover:px-4 transition-all duration-300"
             >
-              <div className="sm:w-1/4">
-                <h3 className="font-heading text-2xl text-chalk">{company.name}</h3>
+              <div className="sm:w-1/4 flex items-center gap-3">
+                {(company as { logo?: string }).logo && (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img src={(company as { logo?: string }).logo} alt={company.name} loading="lazy" decoding="async" width={96} height={40}
+                    className="h-10 w-auto object-contain bg-white rounded-md border border-gray-800 px-2 py-1 shrink-0" />
+                )}
+                <h3 className="font-heading text-xl md:text-2xl text-chalk">{company.name}</h3>
               </div>
               <div className="sm:w-1/4">
                 <span className="inline-block font-body text-xs tracking-wider uppercase border border-gray-400 text-gray-600 px-3 py-1">

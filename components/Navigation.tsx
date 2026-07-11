@@ -52,12 +52,9 @@ export default function Navigation() {
 
   return (
     <>
-      <motion.header
-        initial={{ y: -80 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-ink/95 backdrop-blur-sm border-b border-gray-800 ${
-          scrolled ? 'shadow-[0_8px_30px_-12px_rgba(255,106,26,0.25)]' : ''
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 bg-ink/95 backdrop-blur-sm border-b border-gray-800 transition-shadow duration-300 ${
+          scrolled ? 'shadow-[0_8px_30px_-12px_rgba(255,117,88,0.25)]' : ''
         }`}
       >
         <div className="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
@@ -108,7 +105,7 @@ export default function Navigation() {
             </button>
           </div>
         </div>
-      </motion.header>
+      </header>
 
       <AnimatePresence>
         {open && (
@@ -118,7 +115,7 @@ export default function Navigation() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-ink/80 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-black/50 z-40"
               onClick={() => setOpen(false)}
             />
             <motion.div
@@ -138,13 +135,8 @@ export default function Navigation() {
               </div>
 
               <nav className="flex-1 overflow-y-auto py-6">
-                {navItems.map((item, i) => (
-                  <motion.div
-                    key={item.href}
-                    initial={{ opacity: 0, x: 40 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }}
-                  >
+                {navItems.map((item) => (
+                  <div key={item.href}>
                     <Link
                       href={item.href}
                       className={`w-full text-left px-8 py-4 border-b border-gray-800/50 flex items-center justify-between transition-colors duration-200 ${
@@ -158,7 +150,7 @@ export default function Navigation() {
                         <path d="M3 8h10M9 4l4 4-4 4" />
                       </svg>
                     </Link>
-                  </motion.div>
+                  </div>
                 ))}
 
                 <div className="px-8 py-5 mt-2 border-t border-gray-800/60 flex flex-col gap-2">

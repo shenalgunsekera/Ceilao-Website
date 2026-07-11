@@ -9,47 +9,45 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ── Light orange/white theme ──
-        // Tokens are REMAPPED so the whole site reads white + orange:
-        //   ink   = page background (white)
-        //   chalk = primary text (deep burnt-orange, near-black but warm)
-        //   gray-900..700 = light orange surfaces / borders
-        //   gray-600..300 = readable orange-brown text tones
+        // ── Easy-on-the-eyes light theme ──
+        // Text and surfaces are NEUTRAL (soft near-black + cool greys) so long
+        // reading is comfortable; the coral #FF7558 is used strictly as the
+        // accent — buttons, links, highlights — never for body text.
         ink: '#FFFFFF',
-        chalk: '#3A1605',
-        'gray-900': '#FFF4ED', // lightest orange surface (cards, footer, menu)
-        'gray-800': '#FBDDC8', // hairline borders / dividers
-        'gray-700': '#F6C9A8', // input borders
-        'gray-600': '#A85A2E', // muted icon / faint text
-        'gray-500': '#9A4A1E', // muted labels (readable on white)
-        'gray-400': '#84380F', // secondary text
-        'gray-300': '#6E2E0C', // strong secondary text
-        'gray-200': '#FCE7D7',
-        'gray-100': '#FFF1E7',
-        // ── Ceilao brand: orange + white, with orange gradients ──
+        chalk: '#20242C',
+        'gray-900': '#F7F8FA', // lightest surface (cards, footer, menu)
+        'gray-800': '#E8EBEF', // hairline borders / dividers
+        'gray-700': '#D3D8DF', // input borders
+        'gray-600': '#8B93A0', // muted icon / faint text
+        'gray-500': '#69717E', // muted labels (readable on white)
+        'gray-400': '#4B535F', // secondary text
+        'gray-300': '#353D49', // strong secondary text
+        'gray-200': '#EDF0F3',
+        'gray-100': '#FAFBFC',
+        // ── Ceilao brand coral (#FF7558 exact) ──
         brand: {
-          DEFAULT: '#FF6A1A',
-          light: '#FF8B5A',
-          dark: '#E8431E',
-          50: '#FFF4ED',
-          100: '#FFE6D5',
-          200: '#FFC9A3',
-          300: '#FFA868',
-          400: '#FF8B5A',
-          500: '#FF6A1A',
-          600: '#E8431E',
-          700: '#C23512',
-          800: '#9A2A0F',
-          900: '#7A220D',
+          DEFAULT: '#FF7558',
+          light: '#FFA490',
+          dark: '#F0532F',
+          50: '#FFF4F1',
+          100: '#FFE5DE',
+          200: '#FFCBBE',
+          300: '#FFA490',
+          400: '#FF8A70',
+          500: '#FF7558',
+          600: '#F0532F',
+          700: '#D13F1F',
+          800: '#A93217',
+          900: '#7E2611',
         },
       },
       backgroundImage: {
-        'brand-gradient': 'linear-gradient(135deg, #FF8B5A 0%, #FF6A1A 50%, #E8431E 100%)',
-        'brand-gradient-soft': 'linear-gradient(135deg, rgba(255,139,90,0.14), rgba(232,67,30,0.10))',
-        'brand-radial': 'radial-gradient(1200px 600px at 70% -10%, rgba(255,106,26,0.22), transparent 60%)',
+        'brand-gradient': 'linear-gradient(135deg, #FFA490 0%, #FF7558 50%, #F0532F 100%)',
+        'brand-gradient-soft': 'linear-gradient(135deg, rgba(255,117,88,0.12), rgba(240,83,47,0.08))',
+        'brand-radial': 'radial-gradient(1200px 600px at 70% -10%, rgba(255,117,88,0.14), transparent 60%)',
       },
       boxShadow: {
-        brand: '0 18px 50px -12px rgba(255,106,26,0.45)',
+        brand: '0 18px 50px -12px rgba(255,117,88,0.35)',
       },
       fontFamily: {
         display: ['var(--font-bebas)', 'sans-serif'],

@@ -4,37 +4,48 @@ import { useEffect, useState } from 'react';
 import Loader from './Loader';
 
 /**
- * Full-page loading overlay on first load. Stays visible until the browser
- * fires `window.load` — i.e. ALL resources (images, fonts, stylesheets) are
- * fully loaded — then fades out. Rendered from the first paint (initial state
- * is "loading") so there is no flash of unstyled / half-loaded content.
- * A safety timeout guarantees it never gets stuck.
+ * Brief branded overlay on FIRST visit only.
+ * Perf notes:
+ *  • It never waits for window.load (which blocks on every image/font and made
+ *    the site feel seconds-slow) — it fades as soon as the DOM is interactive,
+ *    with a 900 ms hard cap.
+ *  • Repeat navigations in the same session skip it entirely.
+ *  • Once faded it unmounts, so no invisible full-screen layer sits over the
+ *    page eating compositing time while you scroll.
  */
 export default function PageLoader() {
-  const [done, setDone] = useState(false);
+  const [done, setDone] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try { return sessionStorage.getItem('cib_seen') === '1'; } catch { return false; }
+  });
+  const [gone, setGone] = useState(done);
 
   useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    const finish = () => {
-      // small settle delay so the fade feels intentional
-      timer = setTimeout(() => setDone(true), 350);
-    };
+    if (done) return;
+    try { sessionStorage.setItem('cib_seen', '1'); } catch { /* ignore */ }
 
-    if (document.readyState === 'complete') {
-      finish();
-    } else {
-      window.addEventListener('load', finish, { once: true });
+    const finish = () => setDone(true);
+    // Fade when the DOM is ready — never wait for images/fonts.
+    if (document.readyState !== 'loading') {
+      const t = setTimeout(finish, 250);
+      return () => clearTimeout(t);
     }
-
-    // Safety net — never block the page for more than 10s.
-    const safety = setTimeout(() => setDone(true), 10000);
-
+    document.addEventListener('DOMContentLoaded', finish, { once: true });
+    const cap = setTimeout(finish, 900); // hard cap
     return () => {
-      window.removeEventListener('load', finish);
-      clearTimeout(timer);
-      clearTimeout(safety);
+      document.removeEventListener('DOMContentLoaded', finish);
+      clearTimeout(cap);
     };
-  }, []);
+  }, [done]);
+
+  // Unmount after the fade so nothing overlays the page afterwards.
+  useEffect(() => {
+    if (!done || gone) return;
+    const t = setTimeout(() => setGone(true), 450);
+    return () => clearTimeout(t);
+  }, [done, gone]);
+
+  if (gone) return null;
 
   return (
     <div

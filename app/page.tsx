@@ -2,7 +2,7 @@ import Link from 'next/link';
 import VideoScroll from '@/components/VideoScroll';
 import Reveal from '@/components/ui/Reveal';
 import Counter from '@/components/ui/Counter';
-import Marquee from '@/components/ui/Marquee';
+import LogoMarquee from '@/components/ui/LogoMarquee';
 
 const services = [
   { label: 'Health Insurance', desc: 'Hospitalisation, surgical and OPD cover for you and your family.' },
@@ -33,9 +33,21 @@ const stats = [
 ];
 
 const partners = [
-  'Sri Lanka Insurance', 'Ceylinco Life', 'Union Assurance', 'AIA Insurance',
-  'Allianz Lanka', 'Fairfirst', 'HNB Assurance', 'Janashakthi',
-  'Softlogic Life', 'LOLC', 'Continental', 'Orient Insurance',
+  { src: '/partners/slic.jpg',        alt: 'Sri Lanka Insurance' },
+  { src: '/partners/ceylinco.jpg',    alt: 'Ceylinco Life' },
+  { src: '/partners/union.jpg',       alt: 'Union Assurance' },
+  { src: '/partners/aia.jpg',         alt: 'AIA Insurance' },
+  { src: '/partners/allianz.jpg',     alt: 'Allianz Lanka' },
+  { src: '/partners/fairfirst.jpg',   alt: 'Fairfirst Insurance' },
+  { src: '/partners/hnb.jpg',         alt: 'HNB Assurance' },
+  { src: '/partners/softlogic.jpg',   alt: 'Softlogic Life' },
+  { src: '/partners/lolc.jpg',        alt: 'LOLC Insurance' },
+  { src: '/partners/continental.jpg', alt: 'Continental Insurance' },
+  { src: '/partners/orient.jpg',      alt: 'Orient Insurance' },
+  { src: '/partners/amana.jpg',       alt: 'Amana Takaful' },
+  { src: '/partners/peoples.jpg',     alt: "People's Insurance" },
+  { src: '/partners/mbsl.jpg',        alt: 'MBSL Insurance' },
+  { src: '/partners/arpico.jpg',      alt: 'Arpico Insurance' },
 ];
 
 export default function Home() {
@@ -49,36 +61,50 @@ export default function Home() {
           <Reveal>
             <p className="font-body text-xs tracking-widest3 text-brand uppercase mb-5">Who we are</p>
             <h2 className="font-heading text-3xl md:text-5xl leading-tight text-chalk mb-6">
-              Helping Sri Lankans feel in control of their life and health.
+              Insurance without the headache — we do the shopping around for you.
             </h2>
             <p className="font-body text-base md:text-lg text-gray-400 leading-relaxed mb-5">
-              Ceilao Insurance Brokers is an independent brokerage that works for <span className="text-brand font-semibold">you</span>, not the
-              insurer. From health and motor to life, business and travel, we compare cover across Sri Lanka’s leading insurers
-              and place the policy that genuinely fits your needs and budget.
+              Ceilao Insurance Brokers works for <span className="text-brand font-semibold">you</span>, not the
+              insurer. Tell us once what you need — health, motor, life, travel or your business — and we compare
+              Sri Lanka&apos;s leading insurers side by side, then hand you a clear answer instead of a sales pitch.
             </p>
             <p className="font-body text-base text-gray-500 leading-relaxed">
-              One conversation, the whole market, and a broker in your corner at claim time.
+              And when it&apos;s claim time, you&apos;re not on hold with a call centre — you&apos;ve got a broker in your corner.
             </p>
             <div className="flex flex-wrap gap-4 mt-9">
-              <Link href="/get-quote" className="inline-flex items-center px-8 py-4 bg-brand-gradient text-white font-display text-base tracking-widest uppercase transition-transform hover:-translate-y-0.5">
+              <Link href="/get-quote" className="btn-brand px-8 py-4">
                 Get a Quote
               </Link>
-              <Link href="/brokers" className="inline-flex items-center px-8 py-4 border border-brand text-brand font-display text-base tracking-widest uppercase hover:bg-brand hover:text-white transition-colors">
+              <Link href="/brokers" className="inline-flex items-center px-8 py-4 rounded-full border border-brand text-brand font-body text-xs font-semibold tracking-widest uppercase hover:bg-brand hover:text-white transition-colors">
                 Why a broker?
               </Link>
             </div>
           </Reveal>
 
-          {/* animated stat grid */}
-          <div className="grid grid-cols-2 gap-px bg-gray-800 border border-gray-800">
-            {stats.map((s, i) => (
-              <Reveal key={s.v} delay={i * 0.1} y={20} className="bg-ink">
-                <div className="p-8 h-full">
-                  <Counter value={s.k} className="font-display text-5xl md:text-6xl text-brand" />
-                  <div className="font-body text-sm text-gray-500 mt-2">{s.v}</div>
-                </div>
-              </Reveal>
-            ))}
+          {/* photo + stat grid */}
+          <div className="flex flex-col gap-4">
+            <Reveal y={20}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/img/handshake.jpg"
+                alt="A Ceilao broker welcoming a client"
+                className="w-full h-56 md:h-64 object-cover rounded-2xl border border-gray-800"
+                loading="lazy"
+                decoding="async"
+                width={900}
+                height={600}
+              />
+            </Reveal>
+            <div className="grid grid-cols-2 gap-px bg-gray-800 border border-gray-800 rounded-2xl overflow-hidden">
+              {stats.map((s, i) => (
+                <Reveal key={s.v} delay={i * 0.08} y={16} className="bg-ink">
+                  <div className="p-6 md:p-8 h-full">
+                    <Counter value={s.k} className="font-display text-4xl md:text-5xl text-brand" />
+                    <div className="font-body text-sm text-gray-500 mt-2">{s.v}</div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -143,7 +169,7 @@ export default function Home() {
               We place your cover with Sri Lanka’s leading insurers
             </p>
           </Reveal>
-          <Marquee items={partners} />
+          <LogoMarquee logos={partners} />
         </div>
       </section>
 

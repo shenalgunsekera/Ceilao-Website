@@ -7,21 +7,25 @@ const team = [
   {
     name: 'Dr. Manjula Kulathunge',
     role: 'Director',
+    photo: '/team/manjula-kulathunge.webp',
     bio: 'Dr. Kulathunge brings extensive expertise across migration law, telecommunications, stock markets and investment advisory since beginning his career in 1994. In 2001 he completed his MBA in Australia, gaining valuable international insight. Over the years he has spearheaded multiple enterprises, creating employment for over 850 individuals while driving economic growth in Sri Lanka and Australia — with strong business relationships across Australia, Dubai, Qatar, Singapore, Malaysia and Sri Lanka.',
   },
   {
     name: 'Shehan Gunasekera',
     role: 'Consultant',
+    photo: '',
     bio: 'With over 25 years of experience in Sri Lanka’s insurance sector, Mr. Gunasekera is recognised for his leadership and integrity. He has held senior positions at leading insurers, including Senior Vice President of Sales & Distribution at Orient Insurance and Assistant General Manager of Corporate Business at AIA Insurance Lanka, driving strategic initiatives and earning industry recognition.',
   },
   {
     name: 'Dhammika Gunasena',
     role: 'Principal Officer',
+    photo: '/team/dhammika-gunasena.jpg',
     bio: 'Mr. Gunasena has over 19 years of experience in the insurance industry and serves as Ceilao’s Principal Officer. His career includes leadership roles at Orient Insurance, Insureme Insurance Broker, HNB Assurance, AIA Insurance and Janashakthi Insurance. With strong expertise in sales, operations, bancassurance, underwriting and business development, he holds both a Diploma and Higher Diploma in Insurance from Wayamba University.',
   },
   {
     name: 'Saman Jayasena',
     role: 'Head of Sales & Operations',
+    photo: '/team/saman-jayasena.jpg',
     bio: 'Mr. Jayasena has international experience, having worked in Dubai as a Financial Planner specialising in offshore investments and life insurance, achieving MDRT qualification for four years. He has held senior roles in Sri Lanka including Assistant Vice President at Orient Insurance, CEO of P&A Insurance Brokers and Head of Sales at Aseki Insurance Brokers. He also holds CII (UK) qualifications and Australian credentials in Marketing & Sales.',
   },
 ];
@@ -41,13 +45,21 @@ function initials(name: string) {
 export default function AboutPage() {
   return (
     <main className="bg-ink pt-16">
-      {/* Header */}
-      <section className="relative overflow-hidden border-b border-gray-800 bg-gray-100">
-        <div className="absolute inset-0 bg-brand-radial pointer-events-none" />
+      {/* Header — photo banner */}
+      <section className="relative overflow-hidden border-b border-gray-800 bg-[#1B1E24]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/img/skyline.jpg"
+          alt="City skyline at golden hour"
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/40 to-black/30" />
         <div className="relative max-w-[1600px] mx-auto px-6 md:px-12 py-24 md:py-32">
           <Reveal>
-            <p className="font-body text-xs tracking-widest3 text-brand uppercase mb-5">About Ceilao</p>
-            <h1 className="font-display text-chalk leading-none" style={{ fontSize: 'clamp(48px, 8vw, 116px)' }}>
+            <p className="font-body text-xs tracking-widest3 text-brand-light uppercase mb-5">About Ceilao</p>
+            <h1 className="font-display text-white leading-none" style={{ fontSize: 'clamp(48px, 8vw, 116px)' }}>
               YOUR TRUSTED<br /><span className="bg-brand-gradient bg-clip-text text-transparent">INSURANCE PARTNER.</span>
             </h1>
           </Reveal>
@@ -96,9 +108,22 @@ export default function AboutPage() {
               <Reveal key={m.name} delay={(i % 2) * 0.1} className="bg-gray-100">
                 <div className="p-8 md:p-10 h-full">
                   <div className="flex items-center gap-4 mb-5">
-                    <div className="h-14 w-14 rounded-full bg-brand-gradient text-white flex items-center justify-center font-display text-xl shrink-0">
-                      {initials(m.name)}
-                    </div>
+                    {m.photo ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={m.photo}
+                        alt={m.name}
+                        className="h-16 w-16 rounded-full object-cover border-2 border-brand/30 shrink-0"
+                        loading="lazy"
+                        decoding="async"
+                        width={64}
+                        height={64}
+                      />
+                    ) : (
+                      <div className="h-16 w-16 rounded-full bg-brand-gradient text-white flex items-center justify-center font-display text-xl shrink-0">
+                        {initials(m.name)}
+                      </div>
+                    )}
                     <div>
                       <h3 className="font-heading text-xl text-chalk leading-tight">{m.name}</h3>
                       <p className="font-body text-xs tracking-widest uppercase text-brand mt-1">{m.role}</p>
