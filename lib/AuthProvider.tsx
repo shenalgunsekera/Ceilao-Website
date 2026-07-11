@@ -5,7 +5,7 @@ import { onAuthStateChanged, type User } from 'firebase/auth';
 import { auth } from './firebase';
 import { getCustomerProfile } from './customerAuth';
 
-type Profile = { full_name?: string; phone?: string; role?: string } | null;
+type Profile = { full_name?: string; phone?: string; role?: string; phone_verified?: boolean } | null;
 
 type AuthCtx = {
   user: User | null;
