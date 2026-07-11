@@ -65,7 +65,11 @@ function DashboardInner() {
 
   useEffect(() => {
     if (!loading && !user) router.replace('/login?next=/dashboard');
-  }, [loading, user, router]);
+    // Google sign-ins must add a phone number before using the dashboard
+    if (!loading && user && profile !== null && !profile?.phone && user.providerData?.some(p => p?.providerId === 'google.com')) {
+      router.replace('/complete-profile?next=/dashboard');
+    }
+  }, [loading, user, profile, router]);
 
   const loadQuotes = useCallback(async (uid: string) => {
     setFetching(true);

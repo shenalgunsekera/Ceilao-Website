@@ -11,6 +11,8 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   EmailAuthProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
   linkWithCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -168,6 +170,57 @@ export async function loginWithPhonePassword(
   const email = phoneToEmail(e164);
   const cred = await signInWithEmailAndPassword(auth, email, password);
   return cred.user;
+}
+
+/**
+ * Google sign-in for customers. Returns the signed-in user plus whether they
+ * still need to complete their profile (phone number capture) — Google
+ * accounts have no phone, and the brokers call every customer, so a mobile
+ * number is required before the dashboard unlocks.
+ */
+export async function loginWithGoogle(): Promise<{ user: User; needsProfile: boolean }> {
+  const cred = await signInWithPopup(auth, new GoogleAuthProvider());
+  const user = cred.user;
+  const snap = await getDoc(doc(db, 'customers', user.uid));
+  return { user, needsProfile: !snap.exists() || !snap.data()?.phone };
+}
+
+/**
+ * Complete a Google user's profile: claim their phone number (one customer
+ * per phone — the claim doc can only be created if the number is unclaimed)
+ * and write the customers/{uid} profile.
+ */
+export async function completeGoogleProfile(
+  user: User,
+  opts: { fullName: string; rawPhone: string }
+): Promise<void> {
+  const e164 = normalisePhone(opts.rawPhone);
+  if (!e164) throw new Error('Enter a valid Sri Lankan mobile number.');
+
+  // Claim the phone — fails with permission-denied if already claimed.
+  try {
+    await setDoc(doc(db, 'customer_phones', e164), { uid: user.uid, claimed_at: serverTimestamp() });
+  } catch {
+    throw new Error('An account already exists for this phone number. Log in with that account instead, or contact us.');
+  }
+
+  let deviceId = '';
+  try { deviceId = await getOrCreateDeviceId(); } catch { /* best-effort */ }
+
+  await setDoc(
+    doc(db, 'customers', user.uid),
+    {
+      full_name: opts.fullName || user.displayName || '',
+      phone: e164,
+      email: user.email || '',
+      phone_verified: false,
+      role: 'customer',
+      auth_provider: 'google',
+      signup_device_id: deviceId,
+      created_at: serverTimestamp(),
+    },
+    { merge: true }
+  );
 }
 
 export async function logout(): Promise<void> {

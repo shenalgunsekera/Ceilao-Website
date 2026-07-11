@@ -9,6 +9,10 @@ import emailjs from '@emailjs/browser';
 import { db, storage } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthProvider';
 import {
+  getMarketerProfile, getAffiliateRef, lookupMarketerLink, clearAffiliateRef,
+  type MarketerProfile,
+} from '@/lib/marketerAuth';
+import {
   loadProducts,
   customerFields,
   isVisible,
@@ -28,11 +32,21 @@ export default function GetQuotePage() {
   const [files, setFiles] = useState<Record<string, File>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [marketer, setMarketer] = useState<MarketerProfile | null>(null);
 
   // Gate: must be logged in.
   useEffect(() => {
     if (!loading && !user) router.replace('/login?next=/get-quote');
   }, [loading, user, router]);
+
+  // Is the signed-in user one of our field marketers? (POS mode — the quote
+  // is created on the client's behalf and tagged to the marketer.)
+  useEffect(() => {
+    if (!user) { setMarketer(null); return; }
+    let cancelled = false;
+    getMarketerProfile(user.uid).then((m) => { if (!cancelled) setMarketer(m); });
+    return () => { cancelled = true; };
+  }, [user]);
 
   useEffect(() => {
     loadProducts().then((p) => setProducts(p.sort((a, b) => a.label.localeCompare(b.label))));
@@ -88,24 +102,52 @@ export default function GetQuotePage() {
 
       const formData = { ...values, ...uploads, ceilao_ib_file_no: reference };
 
+      // Marketer attribution:
+      //  • POS: a logged-in marketer fills the form for a client → source
+      //    'marketer', bound to their uid/id.
+      //  • Affiliate link: a customer landed with ?ref=MKT001 (60-day window)
+      //    → source stays 'website' but the marketer id/name is stamped on.
+      //  • Neither → plain 'website' = "Direct Website" in the staff system.
+      let attribution: Record<string, unknown>;
+      if (marketer) {
+        attribution = {
+          source: 'marketer',
+          marketer_uid: user.uid,
+          marketer_id: marketer.marketer_id,
+          marketer_name: marketer.full_name || marketer.marketer_id,
+        };
+      } else {
+        attribution = { source: 'website', customer_uid: user.uid };
+        const ref = getAffiliateRef();
+        if (ref) {
+          const link = await lookupMarketerLink(ref);
+          if (link) {
+            attribution.marketer_id = link.marketer_id;
+            attribution.marketer_name = link.name || link.marketer_id;
+          }
+        }
+      }
+
       await addDoc(collection(db, 'quotes'), {
         reference,
         product_key: selected.key,
         product_label: selected.label,
         form_data: formData,
         status: 'draft',
-        source: 'website',
-        customer_uid: user.uid,
+        ...attribution,
         client_name: customerName,
         client_mobile: values.mobile || profile?.phone || '',
         client_email: email,
         sent_to: [],
         responses: [],
         created_by: user.uid,
-        created_by_name: profile?.full_name || customerName,
+        created_by_name: marketer
+          ? `${marketer.full_name || marketer.marketer_id} (Marketer)`
+          : profile?.full_name || customerName,
         created_at: serverTimestamp(),
         updated_at: serverTimestamp(),
       });
+      if (!marketer) clearAffiliateRef();
 
       // Confirmation email to the customer (new EmailJS template).
       const SID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'service_yz6mw9l';
@@ -122,7 +164,7 @@ export default function GetQuotePage() {
         } catch { /* non-fatal */ }
       }
 
-      router.push('/dashboard?submitted=1');
+      router.push(marketer ? '/marketer' : '/dashboard?submitted=1');
     } catch (err: unknown) {
       setError((err as Error)?.message || 'Could not submit your request. Please try again.');
       setBusy(false);
